@@ -64,3 +64,29 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+## Usuários
+
+Rodar o seguinte comando para criar os usuários de teste
+
+```bash
+php artisan db:seed UserSeeder
+```
+Serão criados 2 usuários de teste
+
+#### Usuário 1
+- Email: test@gmail.com
+- Senha: password
+
+#### Usuário 2
+- Email: test2@gmail.com
+- Senha: password
+
+Após rodar o seguinte comando para gerar as credenciais de passoword do Passport
+
+```bash
+php artisan passport:client --password
+```
+
+Com as chaves criadas é so informar nos campos clientID e clientSecret do postmam
