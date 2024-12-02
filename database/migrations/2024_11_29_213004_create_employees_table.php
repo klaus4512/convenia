@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('document_number');
             $table->string('state');
             $table->string('city');
-            $table->unsignedInteger('manager_id')->nullable();
+            $table->unsignedBigInteger('manager_id');
             $table->timestamps();
 
             $table->foreign('manager_id')->references('id')->on('users');
