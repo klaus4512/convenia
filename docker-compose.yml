@@ -1,0 +1,89 @@
+services:
+    nginx:
+        build:
+            context: .
+            dockerfile: ./docker/nginx.Dockerfile
+        depends_on:
+            - php
+            - mysql
+            - test_mysql
+        container_name: laravel_nginx
+        ports:
+            - 80:80
+            - 443:443
+        volumes:
+            - ./:/var/www/html
+
+    php:
+        build:
+            context: .
+            dockerfile: ./docker/php.Dockerfile
+        container_name: laravel_php
+        volumes:
+            - ./:/var/www/html
+
+    mysql:
+        image: mysql:8.0.27
+        platform: linux/amd64
+        container_name: laravel_mysql
+        ports:
+            - 3306:3306
+        volumes:
+            - ./docker/volumes/mysql:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: laraveldb
+            MYSQL_USER: laravel
+            MYSQL_PASSWORD: secret
+            MYSQL_ROOT_PASSWORD: secret
+
+    test_mysql:
+        image: mysql:8.0.27
+        platform: linux/amd64
+        container_name: laravel_test_mysql
+        ports:
+            - 3307:3306
+        volumes:
+            - ./docker/volumes/test_mysql:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: testdb
+            MYSQL_USER: test
+            MYSQL_PASSWORD: testsecret
+            MYSQL_ROOT_PASSWORD: testsecret
+    redis:
+        image: redis:alpine
+        container_name: laravel_redis
+        ports:
+            - 6379:6379
+        volumes:
+            - ./docker/volumes/redis:/data
+    composer:
+        image: composer:2.8.1
+        container_name: laravel_composer
+        volumes:
+            - ./:/var/www/html
+        working_dir: /var/www/html
+
+    artisan:
+        build:
+            context: .
+            dockerfile: ./docker/php.Dockerfile
+        container_name: laravel_artisan
+        volumes:
+            - ./:/var/www/html
+        working_dir: /var/www/html
+        entrypoint: ['php', 'artisan']
+
+    npm:
+        image: node:current-alpine
+        container_name: laravel_npm
+        volumes:
+            - ./:/var/www/html
+        working_dir: /var/www/html
+        entrypoint: ['npm']
+    supervisor:
+        build:
+            context: .
+            dockerfile: ./docker/supervisor.dockerfile
+        container_name: supervisor
+        volumes:
+            - ./:/var/www/html
