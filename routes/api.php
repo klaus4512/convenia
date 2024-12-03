@@ -10,5 +10,5 @@ Route::get('/user', function (Request $request) {
 
 
 Route::group(['middleware' => 'auth:api'], function () {
-    Route::resource('employee', EmployeeController::class)->only(['store']);
+    Route::resource('employee', EmployeeController::class)->only(['index', 'store', 'update', 'destroy']);
 });

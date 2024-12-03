@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Repositories\EmployeeRepository;
-use App\Http\Requests\EmployeeStore;
+use App\Http\Requests\Employee\EmployeeIndex;
+use App\Http\Requests\Employee\EmployeeStore;
+use App\Http\Requests\Employee\EmployeeUpdate;
+use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
 use App\Services\Facades\EmployeeFacade;
 use Illuminate\Http\JsonResponse;
@@ -15,7 +18,17 @@ class EmployeeController extends Controller
     {
     }
 
-    //
+    public function index(EmployeeIndex $request): JsonResponse
+    {
+        $employees = $this->employeeRepository->listEmployersByManagerPaginate($request->user()->id, $request->input('page', 1));
+
+        return response()
+            ->json(
+                EmployeeResource::collection($employees)->resource,
+                200
+            );
+    }
+
     public function store(EmployeeStore $request): JsonResponse
     {
         $employee = new Employee();
@@ -24,18 +37,39 @@ class EmployeeController extends Controller
 
         try{
             $employee = EmployeeFacade::store($employee);
-        } catch (\Exception $e) {
+        } catch (\LogicException $e) {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Não foi possível cadastrar o colaborador',
-                'data' => $e->getMessage()
-            ], 500);
+                'message' =>  $e->getMessage()
+                ], 500);
+        }
+        return response()->json(EmployeeResource::collection($employee), 201);
+    }
+
+    public function update(Employee $employee, EmployeeUpdate $request): JsonResponse
+    {
+        if($request->user()->cannot('update', $employee)){
+            return response()->json([
+                'message' => 'Você não tem permissão para alterar este colaborador'
+            ], 403);
         }
 
+        $employee->fill($request->validated());
+        $employee = $this->employeeRepository->update($employee);
+        return response()->json(EmployeeResource::collection($employee), 200);
+    }
+
+    public function destroy(Employee $employee, Request $request): JsonResponse
+    {
+        if ($request->user()->cannot('delete', $employee)) {
+            return response()
+                ->json([
+                    'message' => 'Você não tem permissão para excluir este colaborador'
+                ], 403);
+        }
+
+        $this->employeeRepository->delete($employee);
         return response()->json([
-            'status' => 'success',
-            'message' => 'Colaborador cadastrado com sucesso!',
-            'data' => $employee
-        ], 201);
+            'message' => 'Colaborador removido com sucesso!'
+            ], 200);
     }
 }

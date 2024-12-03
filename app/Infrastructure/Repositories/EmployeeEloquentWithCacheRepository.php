@@ -40,4 +40,26 @@ class EmployeeEloquentWithCacheRepository implements EmployeeRepository
                 ->first();
         });
     }
+
+    public function listEmployersByManagerPaginate(int $managerId, int $page = 1, int $perPage = 15): object
+    {
+        return Cache::tags($this->cacheTag)->remember('listEmployersByManagerPaginate_' . $managerId . '_' . $perPage. '_' .$page, $this->cacheLifetimeSeconds, function () use ($managerId, $perPage, $page) {
+            return Employee::query()
+                ->where('manager_id', $managerId)
+                ->paginate($perPage, ['*'], 'page', $page);
+        });
+    }
+
+    public function update(Employee $employee): Employee
+    {
+        $employee->save();
+        $this->cleanCache();
+        return $employee;
+    }
+
+    public function delete(Employee $employee): void
+    {
+        $employee->delete();
+        $this->cleanCache();
+    }
 }
