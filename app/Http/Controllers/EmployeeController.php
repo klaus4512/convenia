@@ -42,7 +42,7 @@ class EmployeeController extends Controller
                 'message' =>  $e->getMessage()
                 ], 500);
         }
-        return response()->json(EmployeeResource::collection($employee), 201);
+        return response()->json(EmployeeResource::make($employee), 201);
     }
 
     public function update(Employee $employee, EmployeeUpdate $request): JsonResponse
@@ -55,7 +55,7 @@ class EmployeeController extends Controller
 
         $employee->fill($request->validated());
         $employee = $this->employeeRepository->update($employee);
-        return response()->json(EmployeeResource::collection($employee), 200);
+        return response()->json(EmployeeResource::make($employee), 200);
     }
 
     public function destroy(Employee $employee, Request $request): JsonResponse
