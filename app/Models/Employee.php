@@ -20,6 +20,7 @@ class Employee extends Model
         'document_number',
         'state',
         'city',
+        'manager_id',
     ];
 
     protected function documentNumber(): Attribute
