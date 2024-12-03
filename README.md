@@ -26,12 +26,17 @@ docker compose up -d
 
 - O seguinte comando para rodar as migrations
 ```console
-docker exec -t laravel_php php artisan migrate
+docker exec --user $(id -u):$(id -g) -it laravel_php php artisan migrate
 ```
 
-- E por fim rodar o seguinte comando para gerar a chave do projeto
+- Rodar o seguinte comando para gerar a chave do projeto
 ```console
-sudo docker exec -t laravel_php php artisan key:generate
+docker exec --user $(id -u):$(id -g) -it laravel_php php artisan key:generate
+```
+
+- Rodar o seguinte comando para gerar as chaves de criptografia do Passport
+```console
+docker exec --user $(id -u):$(id -g) -it laravel_php php artisan passport:keys
 ```
 
 ## Acessar o projeto
@@ -43,7 +48,7 @@ Acessar o projeto localmente pelo link: http://localhost:80
 Rodar o seguinte comando para criar os usuários de teste
 
 ```bash
-docker exec -t laravel_php php artisan db:seed UserSeeder
+docker exec --user $(id -u):$(id -g) -it laravel_php php artisan db:seed UserSeeder
 ```
 Serão criados 2 usuários de teste
 
@@ -58,7 +63,7 @@ Serão criados 2 usuários de teste
 Após rodar o seguinte comando para gerar as credenciais de passoword do Passport
 
 ```bash
-docker exec -it laravel_php php artisan passport:client --password
+docker exec --user $(id -u):$(id -g) -it laravel_php php artisan passport:client --password
 ```
 
 Com as chaves criadas é so informar nos campos clientID e clientSecret do postmam
@@ -82,5 +87,5 @@ MAIL_FROM_ADDRESS=
 Para rodar os testes é necessario rodar o seguinte comando
 
 ```console
-docker exec laravel_php php artisan test
+docker exec --user $(id -u):$(id -g) -it laravel_php php artisan test
 ```
